@@ -1,0 +1,113 @@
+/* Additional body parameters */
+body {
+	height: 70vh;
+	margin: 20px 50px 20px 50px; 
+	font-family: Helvetica, Arial;
+}
+
+/* Grey box for showing logon prompt */
+#greybox {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width:100%;
+	height: 100%;
+	background:#000000;
+	opacity: 0;
+	visibility: hidden;
+	
+	/* Animations */
+	transition:visibility 0.5s linear 0.5s,opacity 0.5s linear;
+}
+
+#greybox.visible {
+	opacity: 0.5;
+	visibility: visible;
+}
+
+/* Logon screen showing for not-logged users */
+#logScreen {
+	position: fixed;
+    
+    left: 50%;
+    top: 50%;
+	
+	width: 400px;
+	margin-left: -200px;
+	
+	height: 150px;
+	margin-top:-75px;
+	background: white;
+	
+	border: 2px solid;
+	border-color: #CCCCCC;
+    border-radius: 10px;
+    
+    text-align: center;
+}
+
+/* Small status field for reporting trouble with logging */
+#logonStatus {
+	margin: 10px 10px 10px 10px;
+	color: red;
+}
+
+/* Main  chat container */
+#chatContainer {
+	background: #FFE87C;
+	width: 100%;
+	height: 100%;
+	padding-bottom: 150px;
+	border: 2px solid;
+	border-color: #CCCCCC;
+    border-radius: 10px;
+}
+
+/* Main chat window */
+#chatElements {
+	width: 100%;
+	height: 100%;
+	margin-bottom: 30px;
+}
+
+#chatWindow {
+	overflow: hidden;
+	background: #EEEEEE;
+	height: 100%;
+	margin: 10px 10px 10px 10px;
+	border: 2px solid;
+	border-radius: 5px;
+    border-color: #DDDDDD;
+}
+
+/* Logged users list */
+#usersList {
+  	width: 15%;	
+  	height: 100%;
+	background: #EEEEEE;
+	float: right;
+	margin: 0 10px 10px 10px;
+	border: 2px solid;
+    border-radius: 5px;
+    border-color: #DDDDDD;
+    overflow: auto;
+	overflow-x: hidden;
+}
+
+/* Status bar */
+#statusBar {
+	width: 100%;
+	background: #0B97C4;
+	opacity: 0.5;
+	height:30px;
+}
+
+/* Message window - fixed height */
+#messageWindow {
+	height: 70px;
+	background: #FFFFFF;
+	margin: 10px 10px 10px 10px;
+	padding: 10px 10px 10px 10px;
+    border-radius: 5px;
+    border-color: #DDDDDD;
+}
