@@ -25,7 +25,7 @@ function initSocket() {
 	
 	// Action on closing/refreshing window
 	window.onbeforeunload = function() { 
-       socket.emit('logoff',username);
+       logOff(username);
     };
 }
 
@@ -65,7 +65,7 @@ function setNewUser(data) {
  */
 function logIn(data) {
 	// Logon status field
-	var logonStatus = document.getElementById('logonStatus');
+	var logonResponse = document.getElementById('logonResponse');
 	
 	// Login prompt and greybox
 	var greybox = document.getElementById('greybox');
@@ -76,14 +76,22 @@ function logIn(data) {
 	
 	if(status=='OK') {
 		// Login OK - set cookie and clear login status
-		logonStatus.innerHTML = "";
+		logonResponse.innerHTML = "";
 		setCookie("username",username,7);
 	
 		// Hide login prompt
 		greybox.classList.remove("visible");
+		
+		// Show information about login in header
+		var loggedStatus = document.getElementById('loggedStatus');
+		loggedStatus.innerHTML = 'Logged in as: '+username+' , <a id="logoff" href="#noaction">Log off</a>';
+		
+		// Add logging out possibility
+		var logoffLink = document.getElementById('logoff');
+		logoffLink.onclick = function(ev) {logOff(username,true);};
 	} else {
 		// Show login prompt
-		logonStatus.innerHTML = "Something went wrong during logon: <br/>"+status;
+		logonResponse.innerHTML = "Something went wrong during logon: <br/>"+status;
 		greybox.classList.add("visible");
 	}
 }
@@ -91,8 +99,20 @@ function logIn(data) {
 /**
  * Logs the user off
  */
-function logOff() {
+function logOff(username,withCookies) {
+	
+	// Check if cookies should be removed
+	withCookies = typeof withCookies !== 'undefined' ? withCookies : false;
+	
+	if(withCookies)
+		deleteCookie('username');
+		
+	// Emit logoff info to server
 	socket.emit('logoff',username);
+	
+	// Show greybox again
+	var greybox = document.getElementById('greybox');
+	greybox.classList.add("visible");
 }
 
 /**
@@ -121,4 +141,14 @@ function getCookie(cname) {
         if (c.indexOf(name) != -1) return c.substring(name.length,c.length);
     }
     return "";
+}
+
+/**
+ * Deletes cookie
+ * @param {Object} cname Name of cookie to delete
+ */
+function deleteCookie(cname) {
+	var d = new Date();
+    var expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=; " + expires;
 }
