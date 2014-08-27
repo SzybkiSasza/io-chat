@@ -2,13 +2,13 @@
 var express = require('express'),
 http = require('http'),
 path = require('path'),
-io = require('socket.io'),
+sio = require('socket.io'),
 repl = require("repl");;
 
 // Object instances
 var app = express();
 var httpServer = http.Server(app);
-var socket = io(httpServer);
+var io = sio(httpServer);
 
 // List of users with socket id's
 var users = [];
@@ -27,12 +27,11 @@ httpServer.listen(3000, function(){
 });
 
 // Chat logic - using  socket
-socket.on('connection', function(socket){
+io.on('connection', function(socket){
   	console.log('User connected: '+socket.id);
   
-	socket.on('login', function(username, callback) {
-		callback("DUPA");
-		logIn(socket, username, callback);
+	socket.on('login', function(username) {
+		logIn(socket, username);
 	});
 	
 	socket.on('disconnect', function(){
@@ -40,8 +39,9 @@ socket.on('connection', function(socket){
   	});
 });
 
-function logIn(socket, username, callback) {
-	console.log("Something is trying to log on...");
+function logIn(socket, username) {
+	
+	console.log("Something is trying to log on... " + socket.id);
 
 	// Check if user is already logged on
 	var found = false;
@@ -51,10 +51,10 @@ function logIn(socket, username, callback) {
 	});
 	
 	if(found) {
-		callback("User already logged on");
+		socket.emit('login',{username: username, status: 'User already logged on!!!'});
 	} else {
-		console.log("Logging in: " + username);
+		console.log('Logging in: ' + username);
 		users.push({username: username, socket_id: socket.id});
-		callback("DUPA");
+		socket.emit('login',{username: username, status: 'OK'});
 	}
 }

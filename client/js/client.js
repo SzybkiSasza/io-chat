@@ -6,32 +6,36 @@ var login;
  * Inits the app
  */
 function init() {
-	// Initialize socket
-	socket = io();
+	// Init the socket
+	initSocket();
 	
-	// Check if user is already logged
-	var username = getCookie('username');
-	if(username=="")
-		showLogonPrompt();
-	else
-		logIn(username);
+	// Manage user login
+	manageUserLogin();
 }
 
 /**
- * Displays logon prompt when user is not found
+ * Inits the socket
  */
-function showLogonPrompt() {
-	var greybox = document.getElementById('greybox');
-	var logonWindow = document.getElementById('logScreen');
+function initSocket() {
+	// Initialize socket
+	socket = io();
+	socket.on('login', function(data) {logIn(data);});
+}
+
+/**
+ * Manages user login - checking cookies etc.
+ */
+function manageUserLogin() {
 	
-	greybox.classList.add("visible");
+	// Check if user exists in cookies
+	var username = getCookie('username');
 	
-	var logonWindowHTML ='<h2>Please choose username:</h2>';
-	logonWindowHTML += '<form id="loginForm" action="" onsubmit="setNewUser(this); return false;">';
-	logonWindowHTML += '<input type="text" id="username" placeholder="Username..."/><input type="button" value="Log in" onclick="setNewUser(this.form)"/>';
-	logonWindowHTML += '</form><div id="logonStatus"></div>';
-	
-	logonWindow.innerHTML = logonWindowHTML;
+	if(username=="") {
+		var greybox = document.getElementById('greybox');
+		greybox.classList.add("visible");
+	} else {
+		socket.emit('login', username);
+	}
 }
 
 /**
@@ -42,38 +46,39 @@ function setNewUser(data) {
 	// Get username field
 	var username = data.querySelector("#username").value;
 	
-	console.log("Creating new user: ");
-	console.log(username);
-	
-	// Prepare logon status field
-	var logonStatus = document.getElementById('logonStatus');
-	
+	// Emit username to server
 	if(username!="") {
-		var loginStatus = logIn(username);
-		console.log(loginStatus);
-		if(loginStatus=="") {
-			
-			// Login OK - set cookie and clear login status
-			logonStatus.innerHTML = "";
-			setCookie("username",username,7);
-		
-			// Hide login prompt
-			var greybox = document.getElementById('greybox');
-			greybox.classList.remove("visible");
-		} else {
-			logonStatus.innerHTML = "Something went wrong during logon: "+loginStatus+", try again later";
-		}
+		socket.emit('login', username);
 	}
 }
 
 /**
- * Logs new user to the chat
- * @param {String} username Username to log in
+ * Logs new user to the chat based on response from server
+ * @param {String} data Data with info if user was positively logged in
  */
-function logIn(username) {
-	socket.emit('login', username, function(data) {
-		console.log(data);
-	});	
+function logIn(data) {
+	// Logon status field
+	var logonStatus = document.getElementById('logonStatus');
+	
+	// Login prompt and greybox
+	var greybox = document.getElementById('greybox');
+	
+	// Data fields
+	var username = data.username;
+	var status = data.status;
+	
+	if(status=='OK') {
+		// Login OK - set cookie and clear login status
+		logonStatus.innerHTML = "";
+		setCookie("username",username,7);
+	
+		// Hide login prompt
+		greybox.classList.remove("visible");
+	} else {
+		// Show login prompt
+		logonStatus.innerHTML = "Something went wrong during logon: <br/>"+status;
+		greybox.classList.add("visible");
+	}
 }
 
 /**
