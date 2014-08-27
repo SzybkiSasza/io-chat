@@ -1,6 +1,6 @@
 
 var socket;
-var login;
+var username;
 
 /**
  * Inits the app
@@ -18,8 +18,15 @@ function init() {
  */
 function initSocket() {
 	// Initialize socket
-	socket = io();
-	socket.on('login', function(data) {logIn(data);});
+	socket = io.connect('localhost', {'sync disconnect on unload': false });
+	
+	// Action on login response
+	socket.on('loginResponse', function(data) {logIn(data);});
+	
+	// Action on closing/refreshing window
+	window.onbeforeunload = function() { 
+       socket.emit('logoff',username);
+    };
 }
 
 /**
@@ -28,7 +35,7 @@ function initSocket() {
 function manageUserLogin() {
 	
 	// Check if user exists in cookies
-	var username = getCookie('username');
+	username = getCookie('username');
 	
 	if(username=="") {
 		var greybox = document.getElementById('greybox');
@@ -44,7 +51,7 @@ function manageUserLogin() {
 function setNewUser(data) {
 	
 	// Get username field
-	var username = data.querySelector("#username").value;
+	username = data.querySelector("#username").value;
 	
 	// Emit username to server
 	if(username!="") {
@@ -79,6 +86,13 @@ function logIn(data) {
 		logonStatus.innerHTML = "Something went wrong during logon: <br/>"+status;
 		greybox.classList.add("visible");
 	}
+}
+
+/**
+ * Logs the user off
+ */
+function logOff() {
+	socket.emit('logoff',username);
 }
 
 /**

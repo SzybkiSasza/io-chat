@@ -5,6 +5,26 @@ body {
 	font-family: Helvetica, Arial;
 }
 
+#header {
+	width: 100%;
+	height: 5%;
+	margin: 20px 10px;
+}
+
+#title {
+	text-align:left;
+	float:left;
+	font-weight: bold;
+	margin-left: 20px;
+	font-size: 150%;
+}
+
+/* Small div for displaying login status and logging off */
+#loggedStatus {
+	text-align:right;
+	float:right;
+}
+
 /* Grey box for showing logon prompt */
 #greybox {
 	position: absolute;
@@ -19,7 +39,6 @@ body {
 	/* Animations */
 	transition:visibility 0.5s linear 0.5s,opacity 0.5s linear;
 }
-
 #greybox.visible {
 	opacity: 0.5;
 	visibility: visible;
@@ -46,30 +65,31 @@ body {
     text-align: center;
 }
 
-/* Small status field for reporting trouble with logging */
-#logonStatus {
+/* Small status field for reporting trouble with logging on popup */
+#logonResponse {
 	margin: 10px 10px 10px 10px;
 	color: red;
 }
 
 /* Main  chat container */
 #chatContainer {
-	background: #FFE87C;
+	background: #66CCFF;
 	width: 100%;
 	height: 100%;
 	padding-bottom: 150px;
 	border: 2px solid;
 	border-color: #CCCCCC;
-    border-radius: 10px;
+    border-radius: 5px;
 }
 
-/* Main chat window */
+/* Chat elements - including main window and users list */
 #chatElements {
 	width: 100%;
 	height: 100%;
 	margin-bottom: 30px;
 }
 
+/* Main chat window */
 #chatWindow {
 	overflow: hidden;
 	background: #EEEEEE;
@@ -97,7 +117,7 @@ body {
 /* Status bar */
 #statusBar {
 	width: 100%;
-	background: #0B97C4;
+	background: #FFFFCC;
 	opacity: 0.5;
 	height:30px;
 }
