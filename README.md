@@ -12,4 +12,4 @@ Just clone the repository and run `npm install` and `node server.js` from main d
 
 Contributions
 -------------
-As for now - the project is in early alpha stage, however - if you feel you can contribute to it - just write a comment!
+As for now - the project is in early alpha stage, however - if you feel you can contribute to it - just create an issue!
