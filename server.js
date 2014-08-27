@@ -16,8 +16,8 @@ app.get('/', function(req, res) {
 	res.sendFile('client/index.html');
 });
 
-httpServer.listen(3000, function() {
-	logMsg('Server running on *:3000');
+httpServer.listen(8080, "0.0.0.0", function() {
+	logMsg('Server running on *:8080');
 });
 
 // Chat logic - using  socket
@@ -26,6 +26,10 @@ io.on('connection', function(socket) {
 
 	socket.on('login', function(username) {
 		logIn(socket, username);
+	});
+	
+	socket.on('message', function(data) {
+		processMessage(data);
 	});
 
 	socket.on('logoff', function(username) {
@@ -68,6 +72,9 @@ function logIn(socket, username) {
 			username : username,
 			status : 'OK'
 		});
+		
+		// Emit broadcast message with new user list
+		emitUserList('New user logged in: '+username);
 	}
 }
 
@@ -93,6 +100,40 @@ function logOff(username) {
 	} else {
 		logMsg('User to delete not found!!!');
 	}
+	
+	// Emit new users list
+	emitUserList("User logged off: "+username);
+}
+
+/**
+ * Emits user list to all clients
+ */
+function emitUserList(message) {
+	var usersList = [];
+	users.forEach(function(data) {
+		usersList.push(data.username);
+	});
+	io.emit('usersList',{reason: message, usersList: usersList});
+}
+
+/**
+ * Processes message
+ */
+function processMessage(data) {
+	
+	console.log(data);
+	
+	// Get socket id of the user from "to" field
+	var socketId = 0;
+	users.forEach(function(user) {
+		if(user.username==data.to)
+			socketId = user.socket_id;
+	});
+	
+	if(socketId!=0)
+		io.to(socketId).emit('message',{username: data.from, message: data.message});
+	else
+		io.emit('message',{username: data.from, message: data.message});
 }
 
 /**

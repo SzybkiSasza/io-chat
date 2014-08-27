@@ -7,22 +7,37 @@
 	</head>
 	<body onload="init()">
 		<div id="header">
-			<div id="title">ioChat</div>
-			<div id="loggedStatus"><!-- --></div>
+			<div id="title">
+				ioChat
+			</div>
+			<div id="loggedStatus">
+				<!-- -->
+			</div>
 		</div>
 		<div id="chatContainer">
 			<div id="chatElements">
 				<div id="usersList">
-					<!-- -->
+					<div id="usersListHeader">
+					Logged users: 
+					</div>
+					<div id="usernames">
+						<!-- -->
+					</div>
 				</div>
 				<div id="chatWindow">
 					<div id="statusBar">
 						<!-- -->
 					</div>
+					<div id="messages">
+						<ul><!-- --></ul>
+					</div>
 				</div>
 			</div>
 			<div id="messageWindow">
-				<!-- -->
+				<form id="messageForm" action="" onsubmit="sendMessage(this); return false;">
+					<input type="submit"value="Send!"/>
+					<input id="message" type="text" autocomplete="off" autofocus />
+				</form>
 			</div>
 		</div>
 		<div id="greybox">
