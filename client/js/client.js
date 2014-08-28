@@ -26,15 +26,19 @@ function initSocket() {
 	socket.on('loginResponse', function(data) {
 		logIn(data);
 	});
-	
+
 	// Getting users list on change
-	socket.on('usersList',function(data) {
+	socket.on('usersList', function(data) {
 		handleUserList(data);
 	});
-	
+
 	// Getting messages
-	socket.on('message',function(data) {
+	socket.on('message', function(data) {
 		handleMessage(data);
+	});
+
+	socket.on('disconnect', function(data) {
+		console.log('DISCONNECTING...' + data);
 	});
 
 	// Action on closing/refreshing window
@@ -135,49 +139,78 @@ function logOff(username, withCookies) {
  * Handles users list generation
  */
 function handleUserList(data) {
-	
+
 	var reason = data.reason;
 	var usersList = data.usersList;
-	
-	console.log(reason);
-	
+
 	// Firstly - sort list alphabetically
 	usersList = usersList.sort();
-	
+
 	// Secondly - display users list in a proper div
 	var usersDiv = document.getElementById('usernames');
-	
+
 	var usersHTML = '<ul id="users">';
 	usersList.forEach(function(data) {
-		usersHTML += '<li> '+data+' </li>';
+		usersHTML += '<li onselectstart="return false;" > ' + data + ' </li>';
 	});
 	usersHTML += '</ul>';
-	
 	usersDiv.innerHTML = usersHTML;
-	
+
+	// Add listeners to the new li elements
+	var lis = document.getElementById('users').querySelectorAll('li');
+	for(i = 0;i<lis.length;i++) {
+		lis[i].onclick = function(ev) {
+			makeMessagePrivate(ev);
+		};
+	}
+
 	// Show change inside status window
 	showStatusChange(reason);
 }
+
+/**
+ * Processes click event on users list (private message tag adding)
+ */
+function makeMessagePrivate(event) {
+
+	// Get text content (name of the user)
+	var target = event.target.textContent.trim();
+
+	// Add "priv" tag to the message field
+	var messageField = document.getElementById('message');
+	var message = messageField.value;
+	
+	if (message.indexOf(':priv') > -1) { // Message already private
+		var splitMessage = message.split(":");
+		message = splitMessage[2];
+		messageField.value = ':priv '+target+': '+message;
+	} else {
+		messageField.value = ':priv '+target+': '+message;
+	}
+	messageField.focus();
+}
+
 
 /**
  * Shows status change with fadein and fadeout
  * @param {String} reason Reason (message) to be displayed
  */
 function showStatusChange(reason) {
-	
+
 	// Get status div
 	var statusBar = document.getElementById('statusBar');
-	
+
 	// Get messages list
 	var messagesDiv = document.getElementById('messages');
 	var messagesUl = messagesDiv.querySelector('ul');
-	
+
 	// Add new status message to the list
-	messagesUl.innerHTML += '<li id="status">'+reason+'</li>';
-	
+	messagesUl.innerHTML += '<li id="status">' + reason + '</li>';
+
 	// Scroll messages div to the bottom
 	messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
+
 /**
  * @param {Element} form Form with data to send
  */
@@ -185,36 +218,53 @@ function sendMessage(form) {
 	// Get message field and its value
 	var messageField = form.querySelector("#message");
 	var message = messageField.value;
-	
+
 	// Prepare "to" field
 	var to = "";
-	
+
 	// Check if it contains "priv" tag
-	if(message.indexOf('/priv')>-1) {
+	if (message.indexOf(':priv') > -1) {
 		// Get tag and user
+		var userTo = message.split(':');
+		userTo = userTo[1].split(' ');
+		userTo = userTo[1];
+		userTo = typeof userTo !== 'undefined' ? userTo : '';
+		
+		// If user is filled - send message
+		if(userTo != '') {
+			to = userTo;
+		}
+		
+		// Remove "private" part from the message
+		message = message.split(':');
+		message = message[2];
 	}
-	
+
 	// Emit message
-	if(message != "")
-		socket.emit('message',{from: username, to:to, message:message});
-	
+	if (message != "")
+		socket.emit('message', {
+			from : username,
+			to : to,
+			message : message
+		});
+
 	// Return focus to message field and clear it
 	messageField.value = "";
 	messageField.focus();
 }
 
 function handleMessage(data) {
-	
+
 	// Show message in the message field
 	var messagesDiv = document.getElementById('messages');
 	var messagesUl = messagesDiv.querySelector('ul');
-	
+
 	// Date is created in this place - for now...
 	var date = new Date();
-	
+
 	// Add new chat message to the list
-	messagesUl.innerHTML += '<li><span>[' + date.toLocaleTimeString() + '] '+data.username+':</span> '+data.message+'</li>';
-	
+	messagesUl.innerHTML += '<li><span>[' + date.toLocaleTimeString() + '] ' + data.username + ':</span> ' + data.message + '</li>';
+
 	// Scroll messages div to the bottom
 	messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
