@@ -29,7 +29,7 @@ io.on('connection', function(socket) {
 	});
 	
 	socket.on('message', function(data) {
-		processMessage(data);
+		processMessage(socket,data);
 	});
 
 	socket.on('logoff', function(username) {
@@ -119,20 +119,22 @@ function emitUserList(message) {
 /**
  * Processes message
  */
-function processMessage(data) {
+function processMessage(socketFrom, data) {
 	
-	console.log(data);
+	// Get socket id of the author
+	var socketIdFrom = socketFrom.id;
 	
 	// Get socket id of the user from "to" field
-	var socketId = 0;
+	var socketIdTo = 0;
 	users.forEach(function(user) {
 		if(user.username==data.to)
 			socketId = user.socket_id;
 	});
 	
-	if(socketId!=0)
-		io.to(socketId).emit('message',{username: data.from, message: data.message});
-	else
+	if(socketId!=0) {
+		io.to(socketIdTo).emit('message',{username: data.from, message: '/private/' + data.message});
+		io.to(socketIdFrom).emit('message',{username: data.from, message: '/private to: '+data.to+'/' + data.message});
+	} else
 		io.emit('message',{username: data.from, message: data.message});
 }
 

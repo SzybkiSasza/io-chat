@@ -154,6 +154,14 @@ body {
 #messages li:nth-child(even) {
     background: #EEEEEE;
 }
+/* Message element style - for separating message and other parts */
+#messages li span {
+	color: #00D6B2;
+}
+/* Style of status updates - different than normal messages */
+#messages li#status {
+	background: #FFE87C;
+}
 
 /* Users list */
 ul#users {
@@ -167,6 +175,9 @@ ul#users li {
 	font-weight: bold;
     border-radius: 5px;
     background: #D0D0D0;
+}
+ul#users li:hover {
+    background: #00D6B2;
 }
 
 /* Message window - fixed height */
@@ -195,7 +206,6 @@ ul#users li {
 	border: none;
 	outline: none;
 }
-
 #messageForm input[type=submit] {
 	width: 5%;
 	height:100%;

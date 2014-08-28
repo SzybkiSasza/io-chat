@@ -1,7 +1,6 @@
 /* Global variables section */
 var socket;
 var username;
-var to = "";
 
 /**
  * Inits the app
@@ -28,10 +27,12 @@ function initSocket() {
 		logIn(data);
 	});
 	
+	// Getting users list on change
 	socket.on('usersList',function(data) {
 		handleUserList(data);
 	});
 	
+	// Getting messages
 	socket.on('message',function(data) {
 		handleMessage(data);
 	});
@@ -106,7 +107,7 @@ function logIn(data) {
 		};
 	} else {
 		// Show login prompt
-		logonResponse.innerHTML = "Something went wrong during logon: <br/>" + status;
+		logonResponse.innerHTML = status;
 		greybox.classList.add("visible");
 	}
 }
@@ -166,6 +167,16 @@ function showStatusChange(reason) {
 	
 	// Get status div
 	var statusBar = document.getElementById('statusBar');
+	
+	// Get messages list
+	var messagesDiv = document.getElementById('messages');
+	var messagesUl = messagesDiv.querySelector('ul');
+	
+	// Add new status message to the list
+	messagesUl.innerHTML += '<li id="status">'+reason+'</li>';
+	
+	// Scroll messages div to the bottom
+	messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 /**
  * @param {Element} form Form with data to send
@@ -175,8 +186,17 @@ function sendMessage(form) {
 	var messageField = form.querySelector("#message");
 	var message = messageField.value;
 	
+	// Prepare "to" field
+	var to = "";
+	
+	// Check if it contains "priv" tag
+	if(message.indexOf('/priv')>-1) {
+		// Get tag and user
+	}
+	
 	// Emit message
-	socket.emit('message',{from: username, to:to, message:message});
+	if(message != "")
+		socket.emit('message',{from: username, to:to, message:message});
 	
 	// Return focus to message field and clear it
 	messageField.value = "";
@@ -187,13 +207,13 @@ function handleMessage(data) {
 	
 	// Show message in the message field
 	var messagesDiv = document.getElementById('messages');
-	messagesUl = messagesDiv.querySelector('ul');
+	var messagesUl = messagesDiv.querySelector('ul');
 	
 	// Date is created in this place - for now...
 	var date = new Date();
 	
 	// Add new chat message to the list
-	messagesUl.innerHTML += '<li>[' + date.toLocaleTimeString() + '] '+data.username+': '+data.message+'</li>';
+	messagesUl.innerHTML += '<li><span>[' + date.toLocaleTimeString() + '] '+data.username+':</span> '+data.message+'</li>';
 	
 	// Scroll messages div to the bottom
 	messagesDiv.scrollTop = messagesDiv.scrollHeight;
