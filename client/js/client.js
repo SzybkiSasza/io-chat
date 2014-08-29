@@ -14,9 +14,10 @@ function init() {
 }
 
 /**
- * Inits the socket
+ * Inits the socket with all socket event handling
  */
 function initSocket() {
+	
 	// Initialize socket
 	socket = io.connect(document.domain, {
 		'sync disconnect on unload' : false
@@ -27,7 +28,7 @@ function initSocket() {
 		logIn(data);
 	});
 
-	// Getting users list on change
+	// Getting users list on userlist change
 	socket.on('usersList', function(data) {
 		handleUserList(data);
 	});
@@ -37,18 +38,21 @@ function initSocket() {
 		handleMessage(data);
 	});
 
+	// Action on disconnecting - as for now nothing happens...
 	socket.on('disconnect', function(data) {
 		console.log('DISCONNECTING...' + data);
 	});
 
-	// Action on closing/refreshing window
+	/* Action on closing / refreshing window
+	* Not necessary after adding many sockets per user in server code
+	*/
 	window.onbeforeunload = function() {
-		logOff(username);
+		// logOff(username);
 	};
 }
 
 /**
- * Manages user login - checking cookies etc.
+ * Manages user login - checking cookies and showing logon prompt.
  */
 function manageUserLogin() {
 
@@ -82,18 +86,20 @@ function setNewUser(data) {
  * @param {String} data Data with info if user was positively logged in
  */
 function logIn(data) {
+	
 	// Logon status field
 	var logonResponse = document.getElementById('logonResponse');
 
 	// Login prompt and greybox
 	var greybox = document.getElementById('greybox');
 
-	// Data fields
+	// Data fields from response
 	var username = data.username;
 	var status = data.status;
 
 	if (status == 'OK') {
-		// Login OK - set cookie and clear login status
+		
+		// Login OK - set cookie and hide previous status
 		logonResponse.innerHTML = "";
 		setCookie("username", username, 7);
 
@@ -110,9 +116,12 @@ function logIn(data) {
 			logOff(username, true);
 		};
 	} else {
-		// Show login prompt
+		// Show login prompt with response
 		logonResponse.innerHTML = status;
 		greybox.classList.add("visible");
+		
+		// Change style to original if changed manually
+		greybox.style.visibility = 'visible';
 	}
 }
 
@@ -170,6 +179,7 @@ function handleUserList(data) {
 
 /**
  * Processes click event on users list (private message tag adding)
+ * @param {Event} even Event launched when user clicked on "li" element from users list
  */
 function makeMessagePrivate(event) {
 
@@ -180,11 +190,14 @@ function makeMessagePrivate(event) {
 	var messageField = document.getElementById('message');
 	var message = messageField.value;
 	
-	if (message.indexOf(':priv') > -1) { // Message already private
+	// Message already private
+	if (message.indexOf(':priv') > -1) { 
 		var splitMessage = message.split(":");
 		message = splitMessage[2];
 		messageField.value = ':priv '+target+': '+message;
-	} else {
+	} 
+	// New "private" tag
+	else {
 		messageField.value = ':priv '+target+': '+message;
 	}
 	messageField.focus();
@@ -212,6 +225,7 @@ function showStatusChange(reason) {
 }
 
 /**
+ * Sends message to the server
  * @param {Element} form Form with data to send
  */
 function sendMessage(form) {
@@ -224,7 +238,8 @@ function sendMessage(form) {
 
 	// Check if it contains "priv" tag
 	if (message.indexOf(':priv') > -1) {
-		// Get tag and user
+		
+		// Get tag and user message is addressed to
 		var userTo = message.split(':');
 		userTo = userTo[1].split(' ');
 		userTo = userTo[1];
@@ -253,6 +268,10 @@ function sendMessage(form) {
 	messageField.focus();
 }
 
+/**
+ * Handles message reception
+ * @param {Object} data Data from the server
+ */
 function handleMessage(data) {
 
 	// Show message in the message field
