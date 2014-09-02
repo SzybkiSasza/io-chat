@@ -21,3 +21,6 @@ build/Release
 
 # Node modules
 node_modules
+
+# Eclipse project file
+.project
