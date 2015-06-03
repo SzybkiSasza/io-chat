@@ -1,58 +1,63 @@
 <!doctype html>
 <html>
-	<head>
-		<meta charset=utf-8 />
-		<title>Chat Demo</title>
-		<link rel="stylesheet" type="text/css" href="css/style.css"/>
-	</head>
-	<body onload="init()">
-		<div id="header">
-			<div id="title">
-				ioChat
-			</div>
-			<div id="loggedStatus">
-				<!-- -->
-			</div>
+
+<head>
+	<meta charset=utf-8 />
+	<title>Chat Demo</title>
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+</head>
+
+<body onload="init()">
+	<div id="header">
+		<div id="title">
+			ioChat
 		</div>
-		<div id="chatContainer">
-			<div id="chatElements">
-				<div id="usersList">
-					<div id="usersListHeader">
-					Logged users: 
-					</div>
-					<div id="usernames">
-						<!-- -->
-					</div>
-				</div>
-				<div id="chatWindow">
-					<div id="statusBar">
-						<!-- -->
-					</div>
-					<div id="messages">
-						<ul><!-- --></ul>
-					</div>
-				</div>
-			</div>
-			<div id="messageWindow">
-				<form id="messageForm" action="" onsubmit="sendMessage(this); return false;">
-					<input type="submit"value="Send!"/>
-					<input id="message" type="text" autocomplete="off" autofocus />
-				</form>
-			</div>
+		<div id="loggedStatus">
+			<!-- -->
 		</div>
-		<div id="greybox">
-			<div id="logScreen">
-				<h2>Please choose username:</h2>
-				<form id="loginForm" action="" onsubmit="setNewUser(this); return false;">
-					<input type="text" id="username" placeholder="Username..."/>
-					<input type="button" value="Log in" onclick="setNewUser(this.form)"/>
-				</form>
-				<div id="logonResponse">
+	</div>
+	<div id="chatContainer">
+		<div id="chatElements">
+			<div id="usersList">
+				<div id="usersListHeader">
+					Logged users:
+				</div>
+				<div id="usernames">
 					<!-- -->
 				</div>
 			</div>
+			<div id="chatWindow">
+				<div id="statusBar">
+					<!-- -->
+				</div>
+				<div id="messages">
+					<ul>
+						<!-- -->
+					</ul>
+				</div>
+			</div>
 		</div>
-		<script type="text/javascript" src="node_modules/socket.io-client/socket.io.js"></script>
-		<script type="text/javascript" src="js/client.js"></script>
-	</body>
+		<div id="messageWindow">
+			<form id="messageForm" action="" onsubmit="sendMessage(this); return false;">
+				<input type="submit" value="Send!" />
+				<input id="message" type="text" autocomplete="off" autofocus />
+			</form>
+		</div>
+	</div>
+	<div id="greybox">
+		<div id="logScreen">
+			<h2>Please choose username:</h2>
+			<form id="loginForm" action="" onsubmit="setNewUser(this); return false;">
+				<input type="text" id="username" placeholder="Username..." />
+				<input type="button" value="Log in" onclick="setNewUser(this.form)" />
+			</form>
+			<div id="logonResponse">
+				<!-- -->
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" src="node_modules/socket.io-client/socket.io.js"></script>
+	<script type="text/javascript" src="js/client.js"></script>
+</body>
+
 </html>

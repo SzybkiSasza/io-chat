@@ -6,49 +6,49 @@ var username;
  * Inits the app
  */
 function init() {
-	// Init the socket
-	initSocket();
+  // Init the socket
+  initSocket();
 
-	// Manage user login
-	manageUserLogin();
+  // Manage user login
+  manageUserLogin();
 }
 
 /**
  * Inits the socket with all socket event handling
  */
 function initSocket() {
-	
-	// Initialize socket
-	socket = io.connect(document.domain, {
-		'sync disconnect on unload' : false
-	});
 
-	// Action on login response
-	socket.on('loginResponse', function(data) {
-		logIn(data);
-	});
+  // Initialize socket
+  socket = io.connect(document.domain, {
+    'sync disconnect on unload': false
+  });
 
-	// Getting users list on userlist change
-	socket.on('usersList', function(data) {
-		handleUserList(data);
-	});
+  // Action on login response
+  socket.on('loginResponse', function(data) {
+    logIn(data);
+  });
 
-	// Getting messages
-	socket.on('message', function(data) {
-		handleMessage(data);
-	});
+  // Getting users list on userlist change
+  socket.on('usersList', function(data) {
+    handleUserList(data);
+  });
 
-	// Action on disconnecting - as for now nothing happens...
-	socket.on('disconnect', function(data) {
-		console.log('DISCONNECTING...' + data);
-	});
+  // Getting messages
+  socket.on('message', function(data) {
+    handleMessage(data);
+  });
 
-	/* Action on closing / refreshing window
-	* Not necessary after adding many sockets per user in server code
-	*/
-	window.onbeforeunload = function() {
-		// logOff(username);
-	};
+  // Action on disconnecting - as for now nothing happens...
+  socket.on('disconnect', function(data) {
+    console.log('DISCONNECTING...' + data);
+  });
+
+  /* Action on closing / refreshing window
+   * Not necessary after adding many sockets per user in server code
+   */
+  window.onbeforeunload = function() {
+    // logOff(username);
+  };
 }
 
 /**
@@ -56,15 +56,15 @@ function initSocket() {
  */
 function manageUserLogin() {
 
-	// Check if user exists in cookies
-	username = getCookie('username');
+  // Check if user exists in cookies
+  username = getCookie('username');
 
-	if (username == "") {
-		var greybox = document.getElementById('greybox');
-		greybox.classList.add("visible");
-	} else {
-		socket.emit('login', username);
-	}
+  if (username === '') {
+    var greybox = document.getElementById('greybox');
+    greybox.classList.add('visible');
+  } else {
+    socket.emit('login', username);
+  }
 }
 
 /**
@@ -72,13 +72,13 @@ function manageUserLogin() {
  */
 function setNewUser(data) {
 
-	// Get username field
-	username = data.querySelector("#username").value;
+  // Get username field
+  username = data.querySelector('#username').value;
 
-	// Emit username to server
-	if (username != "") {
-		socket.emit('login', username);
-	}
+  // Emit username to server
+  if (username !== '') {
+    socket.emit('login', username);
+  }
 }
 
 /**
@@ -86,43 +86,43 @@ function setNewUser(data) {
  * @param {String} data Data with info if user was positively logged in
  */
 function logIn(data) {
-	
-	// Logon status field
-	var logonResponse = document.getElementById('logonResponse');
 
-	// Login prompt and greybox
-	var greybox = document.getElementById('greybox');
+  // Logon status field
+  var logonResponse = document.getElementById('logonResponse');
 
-	// Data fields from response
-	var username = data.username;
-	var status = data.status;
+  // Login prompt and greybox
+  var greybox = document.getElementById('greybox');
 
-	if (status == 'OK') {
-		
-		// Login OK - set cookie and hide previous status
-		logonResponse.innerHTML = "";
-		setCookie("username", username, 7);
+  // Data fields from response
+  var username = data.username;
+  var status = data.status;
 
-		// Hide login prompt
-		greybox.classList.remove("visible");
+  if (status == 'OK') {
 
-		// Show information about login in header
-		var loggedStatus = document.getElementById('loggedStatus');
-		loggedStatus.innerHTML = 'Logged in as: ' + username + ' , <a id="logoff" href="#">Log off</a>';
+    // Login OK - set cookie and hide previous status
+    logonResponse.innerHTML = '';
+    setCookie('username', username, 7);
 
-		// Add logging out possibility
-		var logoffLink = document.getElementById('logoff');
-		logoffLink.onclick = function(ev) {
-			logOff(username, true);
-		};
-	} else {
-		// Show login prompt with response
-		logonResponse.innerHTML = status;
-		greybox.classList.add("visible");
-		
-		// Change style to original if changed manually
-		greybox.style.visibility = 'visible';
-	}
+    // Hide login prompt
+    greybox.classList.remove('visible');
+
+    // Show information about login in header
+    var loggedStatus = document.getElementById('loggedStatus');
+    loggedStatus.innerHTML = 'Logged in as: ' + username + ' , <a id="logoff" href="#">Log off</a>';
+
+    // Add logging out possibility
+    var logoffLink = document.getElementById('logoff');
+    logoffLink.onclick = function(ev) {
+      logOff(username, true);
+    };
+  } else {
+    // Show login prompt with response
+    logonResponse.innerHTML = status;
+    greybox.classList.add('visible');
+
+    // Change style to original if changed manually
+    greybox.style.visibility = 'visible';
+  }
 }
 
 /**
@@ -130,18 +130,18 @@ function logIn(data) {
  */
 function logOff(username, withCookies) {
 
-	// Check if cookies should be removed
-	withCookies = typeof withCookies !== 'undefined' ? withCookies : false;
+  // Check if cookies should be removed
+  withCookies = typeof withCookies !== 'undefined' ? withCookies : false;
 
-	if (withCookies)
-		deleteCookie('username');
+  if (withCookies)
+    deleteCookie('username');
 
-	// Emit logoff info to server
-	socket.emit('logoff', username);
+  // Emit logoff info to server
+  socket.emit('logoff', username);
 
-	// Show greybox again
-	var greybox = document.getElementById('greybox');
-	greybox.classList.add("visible");
+  // Show greybox again
+  var greybox = document.getElementById('greybox');
+  greybox.classList.add('visible');
 }
 
 /**
@@ -149,32 +149,31 @@ function logOff(username, withCookies) {
  */
 function handleUserList(data) {
 
-	var reason = data.reason;
-	var usersList = data.usersList;
+  var reason = data.reason;
+  var usersList = data.usersList;
 
-	// Firstly - sort list alphabetically
-	usersList = usersList.sort();
+  // Firstly - sort list alphabetically
+  usersList = usersList.sort();
 
-	// Secondly - display users list in a proper div
-	var usersDiv = document.getElementById('usernames');
+  // Secondly - display users list in a proper div
+  var usersDiv = document.getElementById('usernames');
 
-	var usersHTML = '<ul id="users">';
-	usersList.forEach(function(data) {
-		usersHTML += '<li onselectstart="return false;" > ' + data + ' </li>';
-	});
-	usersHTML += '</ul>';
-	usersDiv.innerHTML = usersHTML;
+  var usersHTML = '<ul id="users">';
+  usersList.forEach(function(data) {
+    usersHTML += '<li onselectstart="return false;" > ' + data + ' </li>';
+  });
 
-	// Add listeners to the new li elements
-	var lis = document.getElementById('users').querySelectorAll('li');
-	for(i = 0;i<lis.length;i++) {
-		lis[i].onclick = function(ev) {
-			makeMessagePrivate(ev);
-		};
-	}
+  usersHTML += '</ul>';
+  usersDiv.innerHTML = usersHTML;
 
-	// Show change inside status window
-	showStatusChange(reason);
+  // Add listeners to the new li elements
+  var lis = document.getElementById('users').querySelectorAll('li');
+  for (i = 0; i < lis.length; i++) {
+    lis[i].onclick = makeMessagePrivate;
+  }
+
+  // Show change inside status window
+  showStatusChange(reason);
 }
 
 /**
@@ -183,24 +182,26 @@ function handleUserList(data) {
  */
 function makeMessagePrivate(event) {
 
-	// Get text content (name of the user)
-	var target = event.target.textContent.trim();
+  // Get text content (name of the user)
+  var target = event.target.textContent.trim();
 
-	// Add "priv" tag to the message field
-	var messageField = document.getElementById('message');
-	var message = messageField.value;
-	
-	// Message already private
-	if (message.indexOf(':priv') > -1) { 
-		var splitMessage = message.split(":");
-		message = splitMessage[2];
-		messageField.value = ':priv '+target+': '+message;
-	} 
-	// New "private" tag
-	else {
-		messageField.value = ':priv '+target+': '+message;
-	}
-	messageField.focus();
+  // Add "priv" tag to the message field
+  var messageField = document.getElementById('message');
+  var message = messageField.value;
+
+  // Message already private
+  if (message.indexOf(':priv') > -1) {
+    var splitMessage = message.split(':');
+    message = splitMessage[2];
+    messageField.value = ':priv ' + target + ': ' + message;
+  }
+
+  // New "private" tag
+  else {
+    messageField.value = ':priv ' + target + ': ' + message;
+  }
+
+  messageField.focus();
 }
 
 
@@ -210,18 +211,18 @@ function makeMessagePrivate(event) {
  */
 function showStatusChange(reason) {
 
-	// Get status div
-	var statusBar = document.getElementById('statusBar');
+  // Get status div
+  var statusBar = document.getElementById('statusBar');
 
-	// Get messages list
-	var messagesDiv = document.getElementById('messages');
-	var messagesUl = messagesDiv.querySelector('ul');
+  // Get messages list
+  var messagesDiv = document.getElementById('messages');
+  var messagesUl = messagesDiv.querySelector('ul');
 
-	// Add new status message to the list
-	messagesUl.innerHTML += '<li id="status">' + reason + '</li>';
+  // Add new status message to the list
+  messagesUl.innerHTML += '<li id="status">' + reason + '</li>';
 
-	// Scroll messages div to the bottom
-	messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  // Scroll messages div to the bottom
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
 /**
@@ -229,43 +230,43 @@ function showStatusChange(reason) {
  * @param {Element} form Form with data to send
  */
 function sendMessage(form) {
-	// Get message field and its value
-	var messageField = form.querySelector("#message");
-	var message = messageField.value;
+  // Get message field and its value
+  var messageField = form.querySelector('#message');
+  var message = messageField.value;
 
-	// Prepare "to" field
-	var to = "";
+  // Prepare "to" field
+  var to = '';
 
-	// Check if it contains "priv" tag
-	if (message.indexOf(':priv') > -1) {
-		
-		// Get tag and user message is addressed to
-		var userTo = message.split(':');
-		userTo = userTo[1].split(' ');
-		userTo = userTo[1];
-		userTo = typeof userTo !== 'undefined' ? userTo : '';
-		
-		// If user is filled - send message
-		if(userTo != '') {
-			to = userTo;
-		}
-		
-		// Remove "private" part from the message
-		message = message.split(':');
-		message = message[2];
-	}
+  // Check if it contains "priv" tag
+  if (message.indexOf(':priv') > -1) {
 
-	// Emit message
-	if (message != "")
-		socket.emit('message', {
-			from : username,
-			to : to,
-			message : message
-		});
+    // Get tag and user message is addressed to
+    var userTo = message.split(':');
+    userTo = userTo[1].split(' ');
+    userTo = userTo[1];
+    userTo = typeof userTo !== 'undefined' ? userTo : '';
 
-	// Return focus to message field and clear it
-	messageField.value = "";
-	messageField.focus();
+    // If user is filled - send message
+    if (userTo !== '') {
+      to = userTo;
+    }
+
+    // Remove "private" part from the message
+    message = message.split(':');
+    message = message[2];
+  }
+
+  // Emit message
+  if (message !== '')
+    socket.emit('message', {
+      from: username,
+      to: to,
+      message: message
+    });
+
+  // Return focus to message field and clear it
+  messageField.value = '';
+  messageField.focus();
 }
 
 /**
@@ -274,18 +275,18 @@ function sendMessage(form) {
  */
 function handleMessage(data) {
 
-	// Show message in the message field
-	var messagesDiv = document.getElementById('messages');
-	var messagesUl = messagesDiv.querySelector('ul');
+  // Show message in the message field
+  var messagesDiv = document.getElementById('messages');
+  var messagesUl = messagesDiv.querySelector('ul');
 
-	// Date is created in this place - for now...
-	var date = new Date();
+  // Date is created in this place - for now...
+  var date = new Date();
 
-	// Add new chat message to the list
-	messagesUl.innerHTML += '<li><span>[' + date.toLocaleTimeString() + '] ' + data.username + ':</span> ' + data.message + '</li>';
+  // Add new chat message to the list
+  messagesUl.innerHTML += '<li><span>[' + date.toLocaleTimeString() + '] ' + data.username + ':</span> ' + data.message + '</li>';
 
-	// Scroll messages div to the bottom
-	messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  // Scroll messages div to the bottom
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
 /**
@@ -295,10 +296,10 @@ function handleMessage(data) {
  * @param {Number} exdays Number of days to expire
  */
 function setCookie(cname, cvalue, exdays) {
-	var d = new Date();
-	d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-	var expires = "expires=" + d.toUTCString();
-	document.cookie = cname + "=" + cvalue + "; " + expires;
+  var d = new Date();
+  d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+  var expires = 'expires=' + d.toUTCString();
+  document.cookie = cname + '=' + cvalue + '; ' + expires;
 }
 
 /**
@@ -306,16 +307,17 @@ function setCookie(cname, cvalue, exdays) {
  * @param {String} cname Name of the cookie
  */
 function getCookie(cname) {
-	var name = cname + "=";
-	var ca = document.cookie.split(';');
-	for (var i = 0; i < ca.length; i++) {
-		var c = ca[i];
-		while (c.charAt(0) == ' ')
-		c = c.substring(1);
-		if (c.indexOf(name) != -1)
-			return c.substring(name.length, c.length);
-	}
-	return "";
+  var name = cname + '=';
+  var ca = document.cookie.split(';');
+  for (var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ')
+      c = c.substring(1);
+    if (c.indexOf(name) != -1)
+      return c.substring(name.length, c.length);
+  }
+
+  return '';
 }
 
 /**
@@ -323,7 +325,7 @@ function getCookie(cname) {
  * @param {Object} cname Name of cookie to delete
  */
 function deleteCookie(cname) {
-	var d = new Date();
-	var expires = "expires=" + d.toUTCString();
-	document.cookie = cname + "=; " + expires;
+  var d = new Date();
+  var expires = 'expires=' + d.toUTCString();
+  document.cookie = cname + '=; ' + expires;
 }
